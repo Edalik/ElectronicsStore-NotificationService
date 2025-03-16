@@ -1,0 +1,27 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5450/postgres
+    username: notification_service
+    password: notification_service
+    hikari:
+      schema: notifications
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+springdoc:
+  api-docs:
+    path: /notification-service/v3/api-docs
+  swagger-ui:
+    path: /notification-service/swagger-ui.html
+
+logging:
+  level:
+    org:
+      zalando:
+        logbook:
+          Logbook: TRACE
