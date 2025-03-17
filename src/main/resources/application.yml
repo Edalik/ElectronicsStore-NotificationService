@@ -13,6 +13,15 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
 
+  kafka:
+    consumer:
+      group-id: electronics-store
+    bootstrap-servers: localhost:29095,localhost:29096,localhost:29097
+    admin:
+      auto-create: true
+    topic:
+      notification: electronics.store.notification.request
+
 springdoc:
   api-docs:
     path: /notification-service/v3/api-docs

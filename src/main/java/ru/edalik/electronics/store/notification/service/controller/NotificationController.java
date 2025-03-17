@@ -45,7 +45,7 @@ public class NotificationController {
         content = @Content(schema = @Schema(implementation = ErrorDto.class))
     )
     @GetMapping("/{id}")
-    public NotificationDto getPurchaseById(
+    public NotificationDto getNotificationById(
         @Parameter(
             description = "UUID пользователя",
             required = true,
@@ -73,7 +73,7 @@ public class NotificationController {
         content = @Content(schema = @Schema(implementation = NotificationDto.class))
     )
     @GetMapping
-    public List<NotificationDto> getProducts(
+    public List<NotificationDto> getNotifications(
         @Parameter(
             description = "UUID пользователя",
             required = true,
