@@ -1,14 +1,17 @@
 package ru.edalik.electronics.store.notification.service.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.edalik.electronics.store.notification.service.mapper.NotificationMapper;
+import ru.edalik.electronics.store.notification.service.model.dto.NotificationRequest;
 import ru.edalik.electronics.store.notification.service.model.entity.Notification;
 import ru.edalik.electronics.store.notification.service.model.exception.NotFoundException;
 import ru.edalik.electronics.store.notification.service.repository.NotificationRepository;
 import ru.edalik.electronics.store.notification.service.service.interfaces.NotificationService;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -16,12 +19,22 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    private final NotificationMapper mapper;
+
+    private final MailSenderImpl mailSender;
+
     @Override
-    public Notification createNotification(UUID userId, String text) {
-        Notification notification = Notification.builder()
-            .userId(userId)
-            .text(text)
-            .build();
+    public Notification createNotification(NotificationRequest notificationRequest) {
+        Notification notification = mapper.toEntity(notificationRequest);
+
+        boolean isMailSent = mailSender.sendMail(
+            notificationRequest.email(),
+            notificationRequest.subject(),
+            notificationRequest.text()
+        );
+        if (isMailSent) {
+            notification.setMailSentTime(LocalDateTime.now());
+        }
 
         return notificationRepository.save(notification);
     }
