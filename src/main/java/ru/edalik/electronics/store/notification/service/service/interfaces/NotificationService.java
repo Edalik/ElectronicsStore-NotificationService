@@ -9,8 +9,8 @@ public interface NotificationService {
 
     Notification createNotification(UUID userId, String text);
 
-    List<Notification> getNotifications(UUID userId);
+    List<Notification> getNotifications();
 
-    Notification getNotificationById(UUID userId, UUID notificationId);
+    Notification getNotificationById(UUID notificationId);
 
 }

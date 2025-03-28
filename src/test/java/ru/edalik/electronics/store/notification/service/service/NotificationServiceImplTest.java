@@ -1,5 +1,6 @@
 package ru.edalik.electronics.store.notification.service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,14 +9,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.edalik.electronics.store.notification.service.model.entity.Notification;
 import ru.edalik.electronics.store.notification.service.model.exception.NotFoundException;
 import ru.edalik.electronics.store.notification.service.repository.NotificationRepository;
+import ru.edalik.electronics.store.notification.service.service.security.UserContextService;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceImplTest {
@@ -27,8 +32,16 @@ class NotificationServiceImplTest {
     @Mock
     NotificationRepository notificationRepository;
 
+    @Mock
+    UserContextService userContextService;
+
     @InjectMocks
     NotificationServiceImpl notificationService;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(userContextService.getUserGuid()).thenReturn(USER_ID);
+    }
 
     @Test
     void createNotification_ShouldSaveWithCorrectParameters() {
@@ -50,7 +63,7 @@ class NotificationServiceImplTest {
         List<Notification> expected = List.of(mock(Notification.class));
         when(notificationRepository.findByUserId(USER_ID)).thenReturn(expected);
 
-        List<Notification> result = notificationService.getNotifications(USER_ID);
+        List<Notification> result = notificationService.getNotifications();
 
         assertEquals(expected, result);
     }
@@ -58,17 +71,18 @@ class NotificationServiceImplTest {
     @Test
     void getNotificationById_ShouldReturnNotification_WhenExists() {
         Notification expected = mock(Notification.class);
-        when(notificationRepository.findById(NOTIFICATION_ID)).thenReturn(Optional.of(expected));
+        when(notificationRepository.findByIdAndUserId(NOTIFICATION_ID, USER_ID)).thenReturn(Optional.of(expected));
 
-        Notification result = notificationService.getNotificationById(USER_ID, NOTIFICATION_ID);
+        Notification result = notificationService.getNotificationById(NOTIFICATION_ID);
 
         assertEquals(expected, result);
     }
 
     @Test
     void getNotificationById_ShouldThrowException_WhenNotExists() {
-        when(notificationRepository.findById(NOTIFICATION_ID)).thenReturn(Optional.empty());
+        when(notificationRepository.findByIdAndUserId(NOTIFICATION_ID, USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> notificationService.getNotificationById(USER_ID, NOTIFICATION_ID));
+        assertThrows(NotFoundException.class, () -> notificationService.getNotificationById(NOTIFICATION_ID));
     }
+
 }
