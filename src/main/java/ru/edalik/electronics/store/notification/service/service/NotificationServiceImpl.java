@@ -6,6 +6,7 @@ import ru.edalik.electronics.store.notification.service.model.entity.Notificatio
 import ru.edalik.electronics.store.notification.service.model.exception.NotFoundException;
 import ru.edalik.electronics.store.notification.service.repository.NotificationRepository;
 import ru.edalik.electronics.store.notification.service.service.interfaces.NotificationService;
+import ru.edalik.electronics.store.notification.service.service.security.UserContextService;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,8 @@ import java.util.UUID;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+
+    private final UserContextService userContextService;
 
     @Override
     public Notification createNotification(UUID userId, String text) {
@@ -27,14 +30,18 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<Notification> getNotifications(UUID userId) {
+    public List<Notification> getNotifications() {
+        UUID userId = userContextService.getUserGuid();
         return notificationRepository.findByUserId(userId);
     }
 
     @Override
-    public Notification getNotificationById(UUID userId, UUID notificationId) {
-        return notificationRepository.findById(notificationId)
-            .orElseThrow(() -> new NotFoundException("Notification with id %s was not found".formatted(notificationId)));
+    public Notification getNotificationById(UUID notificationId) {
+        UUID userId = userContextService.getUserGuid();
+        return notificationRepository.findByIdAndUserId(notificationId, userId)
+            .orElseThrow(
+                () -> new NotFoundException("Notification with id %s was not found".formatted(notificationId))
+            );
     }
 
 }

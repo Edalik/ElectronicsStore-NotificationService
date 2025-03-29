@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,14 +20,15 @@ import java.util.UUID;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(NotificationController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class NotificationControllerTest {
 
     static final String BASE_URL = "/api/v1/notifications";
-    static final String USER_ID_HEADER = "User-Id";
-    static final UUID USER_ID = UUID.randomUUID();
     static final UUID NOTIFICATION_ID = UUID.randomUUID();
 
     @Autowired
@@ -47,11 +49,10 @@ class NotificationControllerTest {
         Notification notification = mock(Notification.class);
         NotificationDto dto = mock(NotificationDto.class);
 
-        when(notificationService.getNotificationById(USER_ID, NOTIFICATION_ID)).thenReturn(notification);
+        when(notificationService.getNotificationById(NOTIFICATION_ID)).thenReturn(notification);
         when(notificationMapper.toDto(notification)).thenReturn(dto);
 
-        mockMvc.perform(get(BASE_URL + "/{id}", NOTIFICATION_ID)
-                .header(USER_ID_HEADER, USER_ID))
+        mockMvc.perform(get(BASE_URL + "/{id}", NOTIFICATION_ID))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(dto)));
     }
@@ -60,11 +61,10 @@ class NotificationControllerTest {
     @SneakyThrows
     void getNotificationById_NotExistingNotification_ReturnsNotFound() {
         String errorMessage = "Notification not found";
-        when(notificationService.getNotificationById(USER_ID, NOTIFICATION_ID))
+        when(notificationService.getNotificationById(NOTIFICATION_ID))
             .thenThrow(new NotFoundException(errorMessage));
 
-        mockMvc.perform(get(BASE_URL + "/{id}", NOTIFICATION_ID)
-                .header(USER_ID_HEADER, USER_ID))
+        mockMvc.perform(get(BASE_URL + "/{id}", NOTIFICATION_ID))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.error").value("Not Found"))
             .andExpect(jsonPath("$.message").value(errorMessage));
@@ -76,27 +76,12 @@ class NotificationControllerTest {
         List<Notification> notifications = List.of(mock(Notification.class));
         List<NotificationDto> dtos = List.of(mock(NotificationDto.class));
 
-        when(notificationService.getNotifications(USER_ID)).thenReturn(notifications);
+        when(notificationService.getNotifications()).thenReturn(notifications);
         when(notificationMapper.toDto(notifications)).thenReturn(dtos);
 
-        mockMvc.perform(get(BASE_URL)
-                .header(USER_ID_HEADER, USER_ID))
+        mockMvc.perform(get(BASE_URL))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(dtos)));
-    }
-
-    @Test
-    @SneakyThrows
-    void getNotificationById_MissingUserId_ReturnsBadRequest() {
-        mockMvc.perform(get(BASE_URL + "/{id}", NOTIFICATION_ID))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void getNotifications_MissingUserId_ReturnsBadRequest() {
-        mockMvc.perform(get(BASE_URL))
-            .andExpect(status().isBadRequest());
     }
 
 }

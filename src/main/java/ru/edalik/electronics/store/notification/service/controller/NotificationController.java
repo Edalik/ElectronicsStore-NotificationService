@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.edalik.electronics.store.notification.service.mapper.NotificationMapper;
@@ -47,20 +46,13 @@ public class NotificationController {
     @GetMapping("/{id}")
     public NotificationDto getNotificationById(
         @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId,
-
-        @Parameter(
             description = "UUID уведомления",
             required = true,
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         )
         @PathVariable UUID id
     ) {
-        return notificationMapper.toDto(notificationService.getNotificationById(userId, id));
+        return notificationMapper.toDto(notificationService.getNotificationById(id));
     }
 
     @Operation(
@@ -73,15 +65,8 @@ public class NotificationController {
         content = @Content(schema = @Schema(implementation = NotificationDto.class))
     )
     @GetMapping
-    public List<NotificationDto> getNotifications(
-        @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId
-    ) {
-        return notificationMapper.toDto(notificationService.getNotifications(userId));
+    public List<NotificationDto> getNotifications() {
+        return notificationMapper.toDto(notificationService.getNotifications());
     }
 
 }

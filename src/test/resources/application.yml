@@ -11,3 +11,9 @@ spring:
       auto-create: true
     topic:
       notification: electronics.store.notification.request
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/electronics-store
