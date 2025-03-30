@@ -40,6 +40,9 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.5'
     implementation 'org.liquibase:liquibase-core:4.31.1'
 
+    //MAIL
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     // VALIDATION
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 

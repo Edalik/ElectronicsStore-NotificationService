@@ -32,6 +32,18 @@ spring:
         jwt:
           issuer-uri: http://localhost:8090/realms/electronics-store
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: www.ayakubov@gmail.com
+    password: vrbb wpmk jvdv ogyc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 management:
   observations:
     annotations:
@@ -41,7 +53,6 @@ management:
     propagation:
       type: b3_multi
 
-springdoc:
   api-docs:
     path: /notification-service/v3/api-docs
   swagger-ui:

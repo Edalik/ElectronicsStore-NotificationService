@@ -20,6 +20,10 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="subject" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="text" type="text">
                 <constraints nullable="false"/>
             </column>
