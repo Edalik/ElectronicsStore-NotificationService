@@ -16,17 +16,30 @@ spring:
   kafka:
     consumer:
       group-id: electronics-store
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     bootstrap-servers: localhost:29095,localhost:29096,localhost:29097
     admin:
       auto-create: true
     topic:
       notification: electronics.store.notification.request
+    listener:
+      observation-enabled: true
 
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8090/realms/electronics-store
+
+management:
+  observations:
+    annotations:
+      enabled: true
+  tracing:
+    enabled: true
+    propagation:
+      type: b3_multi
 
 springdoc:
   api-docs:
