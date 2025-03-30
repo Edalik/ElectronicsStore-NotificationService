@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.edalik.electronics.store.notification.service.mapper.NotificationMapperImpl;
+import ru.edalik.electronics.store.notification.service.model.dto.NotificationRequest;
 import ru.edalik.electronics.store.notification.service.model.entity.Notification;
 import ru.edalik.electronics.store.notification.service.model.exception.NotFoundException;
 import ru.edalik.electronics.store.notification.service.repository.NotificationRepository;
+import ru.edalik.electronics.store.notification.service.service.mail.EmailSenderImpl;
 import ru.edalik.electronics.store.notification.service.service.security.UserContextService;
 
 import java.util.List;
@@ -28,12 +32,20 @@ class NotificationServiceImplTest {
     static final UUID USER_ID = UUID.randomUUID();
     static final UUID NOTIFICATION_ID = UUID.randomUUID();
     static final String NOTIFICATION_TEXT = "Test notification";
+    static final String SUBJECT = "subject";
+    static final String EMAIL = "email";
 
     @Mock
     NotificationRepository notificationRepository;
 
     @Mock
     UserContextService userContextService;
+
+    @Spy
+    NotificationMapperImpl mapper;
+
+    @Mock
+    EmailSenderImpl mailSender;
 
     @InjectMocks
     NotificationServiceImpl notificationService;
@@ -48,14 +60,19 @@ class NotificationServiceImplTest {
         Notification expected = Notification.builder()
             .userId(USER_ID)
             .text(NOTIFICATION_TEXT)
+            .subject(SUBJECT)
+            .email(EMAIL)
             .build();
+        NotificationRequest notificationRequest = new NotificationRequest(USER_ID, NOTIFICATION_TEXT, SUBJECT, EMAIL);
 
         when(notificationRepository.save(any(Notification.class))).thenReturn(expected);
 
-        Notification result = notificationService.createNotification(USER_ID, NOTIFICATION_TEXT);
+        Notification result = notificationService.createNotification(notificationRequest);
 
         assertEquals(USER_ID, result.getUserId());
         assertEquals(NOTIFICATION_TEXT, result.getText());
+        assertEquals(SUBJECT, result.getSubject());
+        assertEquals(EMAIL, result.getEmail());
     }
 
     @Test

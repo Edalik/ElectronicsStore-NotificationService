@@ -22,7 +22,7 @@ public class KafkaConsumer {
         log.info("Received message {}", message);
         try {
             NotificationRequest notificationRequest = objectMapper.readValue(message, NotificationRequest.class);
-            notificationService.createNotification(notificationRequest.userId(), notificationRequest.text());
+            notificationService.createNotification(notificationRequest);
         } catch (Exception e) {
             log.error("Error processing message: {}", message, e);
         }

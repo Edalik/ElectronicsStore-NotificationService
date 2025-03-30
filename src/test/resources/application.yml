@@ -17,3 +17,15 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8090/realms/electronics-store
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
