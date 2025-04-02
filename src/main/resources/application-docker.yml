@@ -1,0 +1,69 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: notification_service
+    password: notification_service
+    hikari:
+      schema: notifications
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  kafka:
+    consumer:
+      group-id: electronics-store
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    bootstrap-servers: broker-1:9092,broker-2:9092,broker-3:9092
+    admin:
+      auto-create: true
+    topic:
+      notification: electronics.store.notification.request
+    listener:
+      observation-enabled: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/electronics-store/protocol/openid-connect/certs
+
+  application:
+    name: notification-service
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+management:
+  observations:
+    annotations:
+      enabled: true
+  tracing:
+    enabled: true
+    propagation:
+      type: b3_multi
+
+  api-docs:
+    path: /notification-service/v3/api-docs
+  swagger-ui:
+    path: /notification-service/swagger-ui.html
+
+logging:
+  level:
+    org:
+      zalando:
+        logbook:
+          Logbook: TRACE
